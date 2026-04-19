@@ -60,15 +60,17 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
         // I introduce a delay before mark seen and typing indicator to make it more natural like human open A whatsapp
         await setTimeout(500);
 
-        // [REF-OPS-12]
-        // Mark seen is required to prevent spam behavior (I read this on WAHA documentation but forget which one)
-        // To add more natural behavior, I add typing indicator
-        await WAHATools.markSeen(from, waha_config.baseUrl, waha_config.apiKey);
-        await WAHATools.indicatorStartTyping(from, waha_config.baseUrl, waha_config.apiKey);
 
         if (agents[from]) {
 
           // -- EXISTING CONVERSATION --
+
+          if (!agents[from].waha_disable_seen_and_typing) {
+
+            // read [REF-OPS-12]
+            await WAHATools.markSeen(from, waha_config.baseUrl, waha_config.apiKey);
+            await WAHATools.indicatorStartTyping(from, waha_config.baseUrl, waha_config.apiKey);
+          }
 
           // read [REF-OPS-3]
           if (agents_abort_controller[from] && !agents_abort_controller[from].signal.aborted) {
@@ -84,11 +86,14 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
             output_temp = '' + output_temp + result;
 
             if (finish) {
+              if (!agents[from].waha_disable_seen_and_typing) {
+                
+                // [REF-OPS-13]
+                // This behavior also to prevent spam detection even though no evidence this will works or not
+                // stop typing and add delay before sending answer
+                await WAHATools.indicatorStopTyping(from, waha_config.baseUrl, waha_config.apiKey);
+              }
 
-              // [REF-OPS-13]
-              // This behavior also to prevent spam detection even though no evidence this will works or not
-              // stop typing and add delay before sending answer
-              await WAHATools.indicatorStopTyping(from, waha_config.baseUrl, waha_config.apiKey);
               await setTimeout(500);
               await WAHATools.sendMessage(from, output_temp, waha_config.baseUrl, waha_config.apiKey);
               if (exit) {
@@ -105,6 +110,12 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
         } else {
 
           // -- NEW CONVERSATION --
+
+          // [REF-OPS-12]
+          // Mark seen is required to prevent spam behavior (I read this on WAHA documentation but forget which one)
+          // To add more natural behavior, I add typing indicator
+          await WAHATools.markSeen(from, waha_config.baseUrl, waha_config.apiKey);
+          await WAHATools.indicatorStartTyping(from, waha_config.baseUrl, waha_config.apiKey);
 
           const llm = config.llm.clone();
           const ac = new AbortController();
@@ -124,9 +135,11 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
               duration: config.timeout,
               async onTimeout() {
                 if (config.timeoutMessage) {
+                  if (!agents[from].waha_disable_seen_and_typing) {
 
-                  // read [REF-OPS-13]
-                  await WAHATools.indicatorStopTyping(from, waha_config.baseUrl, waha_config.apiKey);
+                    // read [REF-OPS-13]
+                    await WAHATools.indicatorStopTyping(from, waha_config.baseUrl, waha_config.apiKey);
+                  }
                   await setTimeout(500);
                   await WAHATools.sendMessage(from, config.timeoutMessage, waha_config.baseUrl, waha_config.apiKey);
                 }
@@ -136,9 +149,12 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
             error: {
               async onError(err: any) {
                 if (config.errorMessage) {
+                  if (!agents[from].waha_disable_seen_and_typing) {
 
-                  // read [REF-OPS-13]
-                  await WAHATools.indicatorStopTyping(from, waha_config.baseUrl, waha_config.apiKey);
+                    // read [REF-OPS-13]
+                    await WAHATools.indicatorStopTyping(from, waha_config.baseUrl, waha_config.apiKey);
+                  }
+
                   await setTimeout(500);
                   await WAHATools.sendMessage(from, await config.errorMessage(err), waha_config.baseUrl, waha_config.apiKey);
                 }
@@ -153,9 +169,12 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
             output_temp = '' + output_temp + result;
 
             if (finish) {
+              if (!agents[from].waha_disable_seen_and_typing) {
 
-              // read [REF-OPS-13]
-              await WAHATools.indicatorStopTyping(from, waha_config.baseUrl, waha_config.apiKey);
+                // read [REF-OPS-13]
+                await WAHATools.indicatorStopTyping(from, waha_config.baseUrl, waha_config.apiKey);
+              }
+
               await setTimeout(500);
               await WAHATools.sendMessage(from, output_temp, waha_config.baseUrl, waha_config.apiKey);
               output_temp = '';

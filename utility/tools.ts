@@ -76,6 +76,7 @@ export class AgentTool {
   private onError: ((err: any) => Promise<void>) | undefined;
   public llm: GenericLLM;
   public abort_signal: AbortSignal;
+  public waha_disable_seen_and_typing: boolean = false;
 
   public source: AgentToolExtraInformation;
 
