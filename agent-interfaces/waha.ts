@@ -47,6 +47,11 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
   app.post('/waha', async (req: Request, res: Response) => {
     const data: WAHABody = req.body;
     switch (data.event) {
+      case "message.any":
+        if (!data.payload.fromMe) {
+          console.log(`Unknown response 2`);
+          break;
+        }
       case "message":
         const message = data.payload.body;
 
@@ -321,7 +326,32 @@ interface WAHAMessage {
   engine: string
 }
 
-type WAHABody = WAHAMessage | WAHASessionStatus;
+interface WAHAMessageAny {
+  id: string
+  timestamp: number
+  event: 'message.any'
+  session: 'default'
+  me: { id: string, pushName: string }
+  payload: {
+    id: string
+    timestamp: number
+    from: string
+    fromMe: boolean
+    source: 'app'
+    to: string
+    body: string // actual message
+    hasMedia: boolean
+    media: any
+    ack: number
+    ackName: 'SERVER'
+    location: any
+    vCards: any[]
+    _data: any
+  }
+  engine: string
+}
+
+type WAHABody = WAHAMessage | WAHAMessageAny | WAHASessionStatus;
 
 interface WAHALidDetail {
   lid: string
