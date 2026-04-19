@@ -77,6 +77,7 @@ export class AgentTool {
   public llm: GenericLLM;
   public abort_signal: AbortSignal;
   public waha_disable_seen_and_typing: boolean = false;
+  public is_last_waha_message_from_me: boolean = false;
 
   public source: AgentToolExtraInformation;
 

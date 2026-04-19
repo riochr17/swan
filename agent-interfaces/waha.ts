@@ -80,6 +80,7 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
           
           agents_abort_controller[from] = new AbortController();
           agents[from].abort_signal = agents_abort_controller[from].signal;
+          agents[from].is_last_waha_message_from_me = data.payload.fromMe;
           agents[from].setOutput(async (result: string, finish?: boolean, exit?: boolean) => {
 
             // read [REF-OPS-8]
@@ -163,6 +164,7 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
             }
           });
           agents[from] = new_agent;
+          agents[from].is_last_waha_message_from_me = data.payload.fromMe;
           new_agent.setOutput(async (result: string, finish?: boolean) => {
             
             // read [REF-OPS-8]
