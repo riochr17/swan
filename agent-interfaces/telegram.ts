@@ -116,7 +116,8 @@ export function startAgentTelegram(agent: AgentType, config: AgentTelegramConfig
           input_abort_signal: ac.signal,
           source: {
             type: 'telegram',
-            from_user: msg.from
+            from_user: msg.from,
+            initial_message: text
           },
           timeout: {
             duration: config.timeout,

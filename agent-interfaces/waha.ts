@@ -117,7 +117,8 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
               from_user: {
                 pn: from,
                 name: data.payload._data.notifyName
-              }
+              },
+              initial_message: message
             },
             timeout: {
               duration: config.timeout,

@@ -30,6 +30,7 @@ export interface AgentToolExtraInformationRESTAPI {
 export interface AgentToolExtraInformationTelegram {
   type: 'telegram'
   from_user?: TelegramBot.User
+  initial_message?: string
 }
 export interface AgentToolExtraInformationWhatsAppWAHA {
   type: 'whatsapp-waha',
@@ -37,6 +38,7 @@ export interface AgentToolExtraInformationWhatsAppWAHA {
     pn: string
     name: string
   }
+  initial_message?: string
 }
 export interface AgentToolExtraInformationSocketIO {
   type: 'socket-io'
