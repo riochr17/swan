@@ -125,4 +125,18 @@ export class OpenAILLM extends GenericLLM {
       throw err;
     }
   }
+
+  public async vectorize(text: string, model: (string & {}) | OpenAI.Embeddings.EmbeddingModel): Promise<number[]> {
+    try {
+      const embedding = await this.client.embeddings.create({
+        model,
+        input: text,
+        encoding_format: 'float'
+      });
+      return embedding.data[0].embedding;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
 }
