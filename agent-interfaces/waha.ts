@@ -61,9 +61,13 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
         // [REF-OPS-10]
         // As per the latest WAHA documentation, user valid destination (from) must be a phone number with ending "@c.us"
         // In some cases `from` item contains lid not phone number, I have to retrieve the phone number with WAHA lid api
-        const from: string = is_from_me
-          ? data.payload.to.endsWith('@c.us') ? data.payload.to : await getPN(data.payload.to, waha_config.baseUrl, waha_config.apiKey)
-          : data.payload.from.endsWith('@c.us') ? data.payload.from : await getPN(data.payload.from, waha_config.baseUrl, waha_config.apiKey);
+        let from: string = '';
+        if (is_from_me) {
+          const to = data.payload.to || data.payload._data.Info.RecipientAlt.replace('s.whatsapp.net', 'c.us');
+          from = to.endsWith('@c.us') ? to : await getPN(to, waha_config.baseUrl, waha_config.apiKey)
+        } else {
+          from = data.payload.from.endsWith('@c.us') ? data.payload.from : await getPN(data.payload.from, waha_config.baseUrl, waha_config.apiKey);
+        }
         let output_temp = '';
 
         // [REF-OPS-11]
@@ -138,7 +142,7 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
               type: 'whatsapp-waha',
               from_user: {
                 pn: from,
-                name: data.payload._data.notifyName
+                name: data.payload._data.notifyName || ''
               },
               initial_message: message
             },
@@ -326,7 +330,48 @@ interface WAHAMessage {
     ackName: 'SERVER'
     location: any
     vCards: any[]
-    _data: any
+    _data: {
+      Info: {
+        Chat: string // '249000779366526@lid',
+        Sender: string // '134471936385049@lid',
+        IsFromMe: boolean
+        IsGroup: boolean
+        AddressingMode: string // '',
+        SenderAlt: string // '',
+        RecipientAlt: string // '6281214338487@s.whatsapp.net',
+        BroadcastListOwner: string // '',
+        BroadcastRecipients: any
+        ID: string // 'AC5FFC089D63664D46E7D2780DDA343C',
+        ServerID: number
+        Type: string // 'text',
+        PushName: string // 'SWAN: AI Agent Ecosystem',
+        Timestamp: string // '2026-04-20T05:04:30Z',
+        Category: string // '',
+        Multicast: boolean
+        MediaType: string // '',
+        Edit: string // '',
+        MsgBotInfo: any[]
+        MsgMetaInfo: any[]
+        VerifiedName: any
+        DeviceSentMeta: any[]
+      }
+      Message: { conversation: string, messageContextInfo: any[] }
+      IsEphemeral: boolean
+      IsViewOnce: boolean
+      IsViewOnceV2: boolean
+      IsViewOnceV2Extension: boolean
+      IsDocumentWithCaption: boolean
+      IsLottieSticker: boolean
+      IsBotInvoke: boolean
+      IsEdit: boolean
+      SourceWebMsg: any
+      UnavailableRequestID: string
+      RetryCount: number
+      NewsletterMeta: any
+      RawMessage: { deviceSentMessage: any[], messageContextInfo: any[] }
+      Status: number
+      notifyName?: string
+    }
   }
   engine: string
 }
@@ -351,7 +396,48 @@ interface WAHAMessageAny {
     ackName: 'SERVER'
     location: any
     vCards: any[]
-    _data: any
+    _data: {
+      Info: {
+        Chat: string // '249000779366526@lid',
+        Sender: string // '134471936385049@lid',
+        IsFromMe: boolean
+        IsGroup: boolean
+        AddressingMode: string // '',
+        SenderAlt: string // '',
+        RecipientAlt: string // '6281214338487@s.whatsapp.net',
+        BroadcastListOwner: string // '',
+        BroadcastRecipients: any
+        ID: string // 'AC5FFC089D63664D46E7D2780DDA343C',
+        ServerID: number
+        Type: string // 'text',
+        PushName: string // 'SWAN: AI Agent Ecosystem',
+        Timestamp: string // '2026-04-20T05:04:30Z',
+        Category: string // '',
+        Multicast: boolean
+        MediaType: string // '',
+        Edit: string // '',
+        MsgBotInfo: any[]
+        MsgMetaInfo: any[]
+        VerifiedName: any
+        DeviceSentMeta: any[]
+      }
+      Message: { conversation: string, messageContextInfo: any[] }
+      IsEphemeral: boolean
+      IsViewOnce: boolean
+      IsViewOnceV2: boolean
+      IsViewOnceV2Extension: boolean
+      IsDocumentWithCaption: boolean
+      IsLottieSticker: boolean
+      IsBotInvoke: boolean
+      IsEdit: boolean
+      SourceWebMsg: any
+      UnavailableRequestID: string
+      RetryCount: number
+      NewsletterMeta: any
+      RawMessage: { deviceSentMessage: any[], messageContextInfo: any[] }
+      Status: number
+      notifyName?: string
+    }
   }
   engine: string
 }
