@@ -294,6 +294,29 @@ export namespace WAHATools {
       throw new Error(err?.response?.data?.toString());
     }
   }
+
+  export async function getContact(pn: string, baseURL: string, apiKey: string): Promise<Contact> {
+    try {
+      const res = await axios.get<Contact>(`/contacts?contactId=${pn}&session=default`, {
+        baseURL,
+        headers: { 'X-Api-Key': apiKey }
+      });
+      return res.data;
+    } catch (err: any) {
+      throw new Error(err?.response?.data?.toString());
+    }
+  }
+
+  export async function checkIsInContact(pn: string, baseURL: string, apiKey: string): Promise<boolean> {
+    const contact = await getContact(pn, baseURL, apiKey);
+    return contact.name.length > 0;
+  }
+}
+
+interface Contact {
+  id: string
+  name: string
+  pushname: string
 }
 
 interface WAHASessionStatus {
