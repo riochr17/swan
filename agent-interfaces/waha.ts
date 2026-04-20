@@ -297,7 +297,7 @@ export namespace WAHATools {
 
   export async function getContact(pn: string, baseURL: string, apiKey: string): Promise<Contact> {
     try {
-      const res = await axios.get<Contact>(`/contacts?contactId=${pn}&session=default`, {
+      const res = await axios.get<Contact>(`/api/contacts?contactId=${pn}&session=default`, {
         baseURL,
         headers: { 'X-Api-Key': apiKey }
       });
