@@ -49,16 +49,21 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
     switch (data.event) {
       case "message.any":
         if (!data.payload.fromMe) {
-          console.log(`Unknown response 2`);
+          break;
+        }
+        if (!/^\/[a-zA-Z0-9]+\./.test(data.payload.body)) {
           break;
         }
       case "message":
         const message = data.payload.body;
+        const is_from_me = data.payload.fromMe && /^\/[a-zA-Z0-9]+\./.test(message);
 
         // [REF-OPS-10]
         // As per the latest WAHA documentation, user valid destination (from) must be a phone number with ending "@c.us"
         // In some cases `from` item contains lid not phone number, I have to retrieve the phone number with WAHA lid api
-        const from: string = data.payload.from.endsWith('@c.us') ? data.payload.from : await getPN(data.payload.from, waha_config.baseUrl, waha_config.apiKey);
+        const from: string = is_from_me
+          ? data.payload.to.endsWith('@c.us') ? data.payload.to : await getPN(data.payload.to, waha_config.baseUrl, waha_config.apiKey)
+          : data.payload.from.endsWith('@c.us') ? data.payload.from : await getPN(data.payload.from, waha_config.baseUrl, waha_config.apiKey);
         let output_temp = '';
 
         // [REF-OPS-11]
@@ -85,7 +90,7 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
           
           agents_abort_controller[from] = new AbortController();
           agents[from].abort_signal = agents_abort_controller[from].signal;
-          agents[from].is_last_waha_message_from_me = data.payload.fromMe;
+          agents[from].is_last_waha_message_from_me = is_from_me;
           agents[from].setOutput(async (result: string, finish?: boolean, exit?: boolean) => {
 
             // read [REF-OPS-8]
@@ -169,7 +174,7 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
             }
           });
           agents[from] = new_agent;
-          agents[from].is_last_waha_message_from_me = data.payload.fromMe;
+          agents[from].is_last_waha_message_from_me = is_from_me;
           new_agent.setOutput(async (result: string, finish?: boolean) => {
             
             // read [REF-OPS-8]
