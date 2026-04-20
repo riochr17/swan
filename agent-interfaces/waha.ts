@@ -27,6 +27,8 @@ export interface AgentWAHAConfig {
 
   // read [REF-CONFIG-4]
   timeoutMessage?: string
+
+  initialValueDisableAutoSeenTyping?: boolean
 }
 export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
   const agents: {[key: string]: AgentTool} = {};
@@ -126,11 +128,13 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
 
           // -- NEW CONVERSATION --
 
-          // [REF-OPS-12]
-          // Mark seen is required to prevent spam behavior (I read this on WAHA documentation but forget which one)
-          // To add more natural behavior, I add typing indicator
-          await WAHATools.markSeen(from, waha_config.baseUrl, waha_config.apiKey);
-          await WAHATools.indicatorStartTyping(from, waha_config.baseUrl, waha_config.apiKey);
+          if (!config.initialValueDisableAutoSeenTyping) {
+            // [REF-OPS-12]
+            // Mark seen is required to prevent spam behavior (I read this on WAHA documentation but forget which one)
+            // To add more natural behavior, I add typing indicator
+            await WAHATools.markSeen(from, waha_config.baseUrl, waha_config.apiKey);
+            await WAHATools.indicatorStartTyping(from, waha_config.baseUrl, waha_config.apiKey);
+          }
 
           const llm = config.llm.clone();
           const ac = new AbortController();
@@ -179,6 +183,7 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
           });
           agents[from] = new_agent;
           agents[from].is_last_waha_message_from_me = is_from_me;
+          agents[from].waha_disable_seen_and_typing = config.initialValueDisableAutoSeenTyping || false;
           new_agent.setOutput(async (result: string, finish?: boolean) => {
             
             // read [REF-OPS-8]
