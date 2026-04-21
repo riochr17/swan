@@ -87,7 +87,10 @@ export function startAgentTelegram(agent: AgentType, config: AgentTelegramConfig
             // send answer to user telegram but ignoring any error
             // this is also a temporary solution, I need to fix this later
             try {
-              await bot.sendMessage(chat_id, output_temp);
+              await bot.sendMessage(chat_id, output_temp, {
+                link_preview_options: { is_disabled: true },
+                disable_web_page_preview: true
+              });
             } catch {}
 
             // read [REF-TOOLS-1]
@@ -97,7 +100,6 @@ export function startAgentTelegram(agent: AgentType, config: AgentTelegramConfig
             } else {
               output_temp = '';
             }
-            delete agents_abort_controller[chat_id];
             return;
           }
         });
@@ -123,7 +125,10 @@ export function startAgentTelegram(agent: AgentType, config: AgentTelegramConfig
             duration: config.timeout,
             async onTimeout() {
               if (config.timeoutMessage) {
-                await bot.sendMessage(chat_id, config.timeoutMessage);
+                await bot.sendMessage(chat_id, config.timeoutMessage, {
+                  link_preview_options: { is_disabled: true },
+                  disable_web_page_preview: true
+                });
               }
               delete agents[chat_id];
             }
@@ -131,7 +136,10 @@ export function startAgentTelegram(agent: AgentType, config: AgentTelegramConfig
           error: {
             async onError(err: any) {
               if (config.errorMessage) {
-                await bot.sendMessage(chat_id, await config.errorMessage(err))
+                await bot.sendMessage(chat_id, await config.errorMessage(err), {
+                  link_preview_options: { is_disabled: true },
+                  disable_web_page_preview: true
+                });
               }
               delete agents[chat_id];
             }
@@ -143,9 +151,11 @@ export function startAgentTelegram(agent: AgentType, config: AgentTelegramConfig
         new_agent.setOutput(async (result: string, finish?: boolean) => {
           output_temp = '' + output_temp + result;
           if (finish) {
-            await bot.sendMessage(chat_id, output_temp);
+            await bot.sendMessage(chat_id, output_temp, {
+              link_preview_options: { is_disabled: true },
+              disable_web_page_preview: true
+            });
             output_temp = '';
-            delete agents_abort_controller[chat_id];
             return;
           }
         });

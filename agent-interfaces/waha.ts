@@ -119,7 +119,6 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
               } else {
                 output_temp = '';
               }
-              delete agents_abort_controller[from];
               return;
             }
           });
@@ -199,7 +198,6 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
               await setTimeout(500);
               await WAHATools.sendMessage(from, output_temp, waha_config.baseUrl, waha_config.apiKey);
               output_temp = '';
-              delete agents_abort_controller[from];
               return;
             }
           });
