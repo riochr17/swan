@@ -53,12 +53,12 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
         if (!data.payload.fromMe) {
           break;
         }
-        if (!/^\/[a-zA-Z0-9]+\./.test(data.payload.body)) {
+        if (!/^\#/.test(data.payload.body)) {
           break;
         }
       case "message":
         const message = data.payload.body;
-        const is_from_me = data.payload.fromMe && /^\/[a-zA-Z0-9]+\./.test(message);
+        const is_from_me = data.payload.fromMe && /^\#/.test(message);
 
         // [REF-OPS-10]
         // As per the latest WAHA documentation, user valid destination (from) must be a phone number with ending "@c.us"
