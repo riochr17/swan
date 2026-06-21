@@ -64,7 +64,7 @@ export interface AgentToolConfig {
   }
 }
 
-export type AgentType = (at: AgentTool) => Promise<void>;
+export type AgentType = (at: AgentTool, params: Record<string, string>) => Promise<void>;
 export class AgentTool {
   public io_mode: 'cli' | 'managed' = 'cli';
   public session_id = v4();
@@ -266,7 +266,7 @@ export class AgentTool {
       }
     });
     try {
-      await other_agent(java_at);
+      await other_agent(java_at, {});
     } catch (err) {
       console.log(err);
     }

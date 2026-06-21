@@ -87,7 +87,7 @@ export async function startAgentServer(agent: AgentType, config: AgentServerConf
       }
     });
 
-    setImmediate(() => agent(new_agent).catch(console.error).finally(() => delete agents[id]));
+    setImmediate(() => agent(new_agent, req.query as Record<string, string>).catch(console.error).finally(() => delete agents[id]));
   });
   app.post('/conversation/:id', async (req: Request, res: Response) => {
 

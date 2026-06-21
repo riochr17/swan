@@ -201,7 +201,7 @@ export function startAgentWAHA(agent: AgentType, config: AgentWAHAConfig) {
               return;
             }
           });
-          setImmediate(() => agent(new_agent).catch(console.error));
+          setImmediate(() => agent(new_agent, {}).catch(console.error));
         }
         break;
 

@@ -12,5 +12,5 @@ export async function startAgentCLI(agent: AgentType, config: AgentCLIConfig) {
     source: { type: 'cli' },
     mode: 'cli'
   });
-  await agent(agent_tool);
+  await agent(agent_tool, {});
 }

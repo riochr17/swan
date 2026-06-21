@@ -1,6 +1,6 @@
 {
   "name": "@ssww.one/framework",
-  "version": "0.5.14",
+  "version": "0.6.0",
   "description": "",
   "main": "dist/index.js",
   "publishConfig": {

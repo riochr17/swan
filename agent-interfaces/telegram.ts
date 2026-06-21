@@ -159,7 +159,7 @@ export function startAgentTelegram(agent: AgentType, config: AgentTelegramConfig
             return;
           }
         });
-        setImmediate(() => agent(new_agent).catch(console.error).finally(() => delete agents[chat_id]));
+        setImmediate(() => agent(new_agent, {}).catch(console.error).finally(() => delete agents[chat_id]));
       }
     });
   }).catch(console.error);
